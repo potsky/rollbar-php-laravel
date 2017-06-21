@@ -58,24 +58,13 @@ The level variable defines the minimum log level at which log messages are sent 
 Usage
 -----
 
-To automatically monitor exceptions, simply use the `Log` facade in your error handler in `app/Exceptions/Handler.php`:
-
-```php
-public function report(Exception $e)
-{
-    \Log::error($e);
-    return parent::report($e);
-}
-```
-
+Fatal error and exceptions handled by Laravel are automatically sent to Rollbar. You do not need to add something in `app/Exceptions/Handler.php`.
 
 Your other log messages will also be sent to Rollbar:
 
 ```php
 \Log::debug('Here is some debug information');
 ```
-
-*NOTE*: Fatal exceptions will always be sent to Rollbar.
 
 ### Context informaton
 
