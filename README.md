@@ -1,19 +1,13 @@
 Laravel Rollbar
 ===============
 
-[![Build Status](https://travis-ci.org/rollbar/rollbar-php-laravel.svg?branch=master)](https://travis-ci.org/rollbar/rollbar-laravel) 
-
-Rollbar error monitoring integration for Laravel projects. This library adds a listener to Laravel's logging component. Laravel's session information will be sent in to Rollbar, as well as some other helpful information such as 'environment', 'server', and 'session'.
-
-![rollbar](https://d37gvrvc0wt4s1.cloudfront.net/static/img/features-dashboard1.png?ts=1361907905)
-
 Installation
 ------------
 
 Install using composer:
 
 ```
-composer require rollbar/rollbar-laravel
+composer require potsky/rollbar-laravel
 ```
 
 Add Project Access Token `post_server_item` from Rollbar.com -> Settings -> Project Access Tokens to .env:
@@ -39,14 +33,23 @@ if ($this->app->environment('production')) {
 Configuration
 -------------
 
-Setting up `ROLLBAR_TOKEN` in .env should be enough for basic configuration.
-
 This package supports configuration through the services configuration file located in `config/services.php`. All configuration variables will be directly passed to Rollbar:
 
 ```php
 'rollbar' => [
     'access_token' => env('ROLLBAR_TOKEN'),
     'level' => env('ROLLBAR_LEVEL'),
+    'person_fn' => function() {
+		if (Auth::user()) {
+			return [
+				'id'       => strval(Auth::user()->id),
+				'username' => strval(Auth::user()->name),
+				'email'    => strval(Auth::user()->email),
+			];
+		} else {
+			return [];
+		}
+	}
 ],
 ```
 
@@ -66,15 +69,6 @@ public function report(Exception $e)
 ```
 
 
-For Laravel 4 installations, this is located in `app/start/global.php`:
-
-```php
-App::error(function(Exception $exception, $code)
-{
-    Log::error($exception);
-});
-```
-
 Your other log messages will also be sent to Rollbar:
 
 ```php
@@ -85,15 +79,7 @@ Your other log messages will also be sent to Rollbar:
 
 ### Context informaton
 
-You can pass user information as context like this:
-
-```php
-\Log::error('Something went wrong', [
-    'person' => ['id' => 123, 'username' => 'John Doe', 'email' => 'john@doe.com']
-]);
-```
-
-Or pass some extra information:
+You can pass extra information:
 
 ```php
 \Log::warning('Something went wrong', [

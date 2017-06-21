@@ -46,7 +46,7 @@ class RollbarServiceProvider extends ServiceProvider
     public function register()
     {
         // Don't register rollbar if it is not configured.
-        if (! getenv('ROLLBAR_TOKEN') and ! $this->app['config']->get('services.rollbar')) {
+        if (! $this->app['config']->get('services.rollbar')) {
             return;
         }
 
@@ -59,7 +59,7 @@ class RollbarServiceProvider extends ServiceProvider
                 'root'         => base_path(),
             ];
             $config = array_merge($defaults, $app['config']->get('services.rollbar', []));
-            $config['access_token'] = getenv('ROLLBAR_TOKEN') ?: $app['config']->get('services.rollbar.access_token');
+            $config['access_token'] = $app['config']->get('services.rollbar.access_token');
 
             if (isset($config['person_fn'])) {
                 $person_fn = $config['person_fn'];
@@ -82,7 +82,7 @@ class RollbarServiceProvider extends ServiceProvider
 
         $this->app->singleton('Rollbar\Laravel\RollbarLogHandler', function ($app) {
 
-            $level = getenv('ROLLBAR_LEVEL') ?: $app['config']->get('services.rollbar.level', 'debug');
+            $level = $app['config']->get('services.rollbar.level', 'debug');
 
             return new RollbarLogHandler($app['Rollbar\RollbarLogger'], $app, $level);
         });
