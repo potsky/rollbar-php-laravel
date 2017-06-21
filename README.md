@@ -55,6 +55,33 @@ This package supports configuration through the services configuration file loca
 
 The level variable defines the minimum log level at which log messages are sent to Rollbar. For development you could set this either to `debug` to send all log messages, or to `none` to sent no messages at all. For production you could set this to `error` so that all info and debug messages are ignored.
 
+If you compile configuration files, do not use a callback function directly. Define the function in a helper include for example and configure the service like this :
+
+```php
+'rollbar' => [
+    'access_token' => env('ROLLBAR_TOKEN'),
+    'level' => env('ROLLBAR_LEVEL'),
+    'person_fn' => 'get_rollbar_person'
+],
+```
+
+In the helper file:
+
+```php
+function get_rollbar_person() {
+	if (Auth::user()) {
+		return [
+			'id'       => strval(Auth::user()->id),
+			'username' => strval(Auth::user()->name),
+			'email'    => strval(Auth::user()->email),
+		];
+	} else {
+		return [];
+	}
+}
+```
+
+
 Usage
 -----
 
